@@ -1,93 +1,50 @@
 <template>
   <v-app id="vuetify-app">
-    <VuetifyLayoutNavigationDrawer
-      :show="primaryDrawer.show"
-      :clipped="primaryDrawer.clipped"
-      :floating="primaryDrawer.floating"
-      :mini-variant="primaryDrawer.mini"
-      :permanent="primaryDrawer.type === 'permanent'"
-      :temporary="primaryDrawer.type === 'temporary'"
-      @show:set="(show) => primaryDrawer.show = show"
-    />
     <VuetifyLayoutAppBar
-      :clipped-left="primaryDrawer.clipped"
-      :show-nav-icon="primaryDrawer.type !== 'permanent'"
-      @navIcon:click="primaryDrawer.show = !primaryDrawer.show"
+      :clipped-left="leftDrawer.clipped"
+      :clipped-right="rightDrawer.clipped"
     >
-      Vuetify
+      <template #navIconLeft>
+        <v-app-bar-nav-icon @click="leftDrawer.show = !leftDrawer.show" />
+      </template>
+
+      <template #content>
+        <v-toolbar-title>
+          Vuetify
+        </v-toolbar-title>
+        <v-spacer />
+      </template>
+
+      <template #navIconRight>
+        <v-app-bar-nav-icon @click="rightDrawer.show = !rightDrawer.show" />
+      </template>
     </VuetifyLayoutAppBar>
+
+    <VuetifyLayoutDrawer
+      :show="leftDrawer.show"
+      :clipped="leftDrawer.clipped"
+      :floating="leftDrawer.floating"
+      :mini-variant="leftDrawer.mini"
+      :permanent="leftDrawer.type === DRAWER_PERMANENT"
+      :temporary="leftDrawer.type === DRAWER_TEMPORARY"
+      @show:set="leftDrawer.show = $event"
+    />
+
+    <VuetifyLayoutDrawer
+      :show="rightDrawer.show"
+      :clipped="rightDrawer.clipped"
+      :floating="rightDrawer.floating"
+      :mini-variant="rightDrawer.mini"
+      :permanent="rightDrawer.type === DRAWER_PERMANENT"
+      :temporary="rightDrawer.type === DRAWER_TEMPORARY"
+      right
+      @show:set="rightDrawer.show = $event"
+    />
+
     <v-main>
-      <v-container fluid>
-        <v-row
-          align="center"
-          justify="center"
-        >
-          <v-col cols="10">
-            <v-card>
-              <v-card-text>
-                <v-row>
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
-                    <span>Scheme</span>
-                    <v-switch
-                      v-model="$vuetify.theme.dark"
-                      primary
-                      label="Dark"
-                    />
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
-                    <span>Drawer</span>
-                    <v-radio-group
-                      v-model="primaryDrawer.type"
-                      column
-                    >
-                      <v-radio
-                        v-for="drawer in drawers"
-                        :key="drawer"
-                        :label="drawer"
-                        :value="drawer.toLowerCase()"
-                        primary
-                      />
-                    </v-radio-group>
-                    <v-switch
-                      v-model="primaryDrawer.clipped"
-                      label="Clipped"
-                      primary
-                    />
-                    <v-switch
-                      v-model="primaryDrawer.floating"
-                      label="Floating"
-                      primary
-                    />
-                    <v-switch
-                      v-model="primaryDrawer.mini"
-                      label="Mini"
-                      primary
-                    />
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    md="6"
-                  >
-                    <span>Footer</span>
-                    <v-switch
-                      v-model="footer.inset"
-                      label="Inset"
-                      primary
-                    />
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
+      <slot />
     </v-main>
+
     <VuetifyLayoutFooter :inset="footer.inset">
       {{ new Date().getFullYear() }}
     </VuetifyLayoutFooter>
@@ -96,27 +53,37 @@
 
 <script>
 import VuetifyLayoutAppBar from './VuetifyLayoutAppBar.vue'
+import VuetifyLayoutDrawer from './VuetifyLayoutDrawer.vue'
 import VuetifyLayoutFooter from './VuetifyLayoutFooter.vue'
-import VuetifyLayoutNavigationDrawer from './VuetifyLayoutNavigationDrawer.vue'
+import { DRAWER_DEFAULT, DRAWER_PERMANENT, DRAWER_TEMPORARY } from './constants/drawerTypes.js'
 
 export default {
+  name: 'VuetifyLayout',
   components: {
     VuetifyLayoutFooter,
     VuetifyLayoutAppBar,
-    VuetifyLayoutNavigationDrawer
+    VuetifyLayoutDrawer
   },
   data () {
     return {
-      drawers: ['Default', 'Permanent', 'Temporary'],
-      primaryDrawer: {
-        show: true,
-        type: 'default',
-        clipped: false,
+      DRAWER_PERMANENT,
+      DRAWER_TEMPORARY,
+      leftDrawer: {
+        show: null,
+        type: DRAWER_DEFAULT,
+        clipped: true,
+        floating: false,
+        mini: false
+      },
+      rightDrawer: {
+        show: null,
+        type: DRAWER_DEFAULT,
+        clipped: true,
         floating: false,
         mini: false
       },
       footer: {
-        inset: true
+        inset: false
       }
     }
   }
